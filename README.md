@@ -52,19 +52,6 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull re
 
 Crie um arquivo chamado `database.example.php` com o seguinte conteúdo:
 
-```php
-<?php
-
-// Exemplo de configuração. Renomeie para config.php e configure com suas credenciais.
-
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'nome_do_banco_de_dados');
-define('DB_USER', 'usuario_do_banco');
-define('DB_PASSWORD', 'senha_do_banco');
-
-?>
-
 ### Considerações Finais
 
-- Certifique-se de substituir `nome_do_banco_de_dados`, `usuario_do_banco` e `senha_do_banco` com suas próprias credenciais no arquivo `database.php`.
 - O arquivo `script.sql` deve conter o script SQL para criar as tabelas necessárias no banco de dados.
