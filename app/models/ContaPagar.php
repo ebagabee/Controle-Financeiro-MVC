@@ -107,6 +107,23 @@ class ContaPagar
         return $stmt->execute();
     }
 
+    public function calcularValorFinal($valor, $data_pagar)
+    {
+        $hoje = date('Y-m-d');
+        $data_pagar = new DateTime($data_pagar);
+        $data_pagar_formatada = $data_pagar->format('Y-m-d');
+
+        if ($hoje < $data_pagar_formatada) {
+            $valor_final = $valor * 0.95;
+        } elseif ($hoje == $data_pagar_formatada) {
+            $valor_final = $valor;
+        } else {
+            $valor_final = $valor * 1.1;
+        }
+
+        return $valor_final;
+    }
+
     public function marcarPago($id_conta_pagar)
     {
         $query = "UPDATE " . $this->table_name . " SET pago = 1 WHERE id_conta_pagar = :id_conta_pagar";

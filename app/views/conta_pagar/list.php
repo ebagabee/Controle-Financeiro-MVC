@@ -13,6 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $contas = $contaPagarController->list($filtro_empresa, $filtro_valor, $condicao_valor, $filtro_data);
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_conta_pagar'])) {
+    $id_conta_pagar = $_POST['id_conta_pagar'];
+    $success = $contaPagarController->marcarPago($id_conta_pagar);
+
+    if ($success) {
+        header("Location: list.php");
+        exit();
+    } else {
+        echo "<p>Erro ao marcar a conta como paga.</p>";
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
     $id_conta_pagar = $_POST['excluir_conta'];
     if ($contaPagarController->delete($id_conta_pagar)) {
@@ -122,16 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
                                                 <button type="submit" class="btn btn-danger btn-sm ml-2">Excluir</button>
                                             </form>
 
-
                                             <?php if (!$conta['pago']) : ?>
                                                 <form class="form-marcar-pago">
                                                     <input type="hidden" name="id_conta_pagar" value="<?php echo $conta['id_conta_pagar']; ?>">
                                                     <button type="button" class="btn btn-success btn-sm marcar-pago-btn">Marcar como Pago</button>
-                                                </form>
-                                            <?php else : ?>
-                                                <form class="form-marcar-pendente">
-                                                    <input type="hidden" name="id_conta_pagar" value="<?php echo $conta['id_conta_pagar']; ?>">
-                                                    <button type="button" class="btn btn-danger btn-sm marcar-pendente-btn">Marcar como Pendente</button>
                                                 </form>
                                             <?php endif; ?>
                                         </div>
@@ -149,8 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
 
     <script>
         $(document).ready(function() {
+            // Função para marcar como pago
             $(document).on('click', '.marcar-pago-btn', function(e) {
-                e.preventDefault();
 
                 var form = $(this).closest('form');
                 var idContaPagar = form.find('input[name="id_conta_pagar"]').val();
@@ -164,20 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
-                            form.closest('tr').find('.status-pago')
-                                .removeClass('text-danger')
-                                .addClass('text-success')
-                                .text('Sim');
-
-                            form.find('.marcar-pago-btn')
-                                .removeClass('btn-success')
-                                .addClass('btn-danger')
-                                .text('Marcar como Pendente')
-                                .removeClass('marcar-pago-btn')
-                                .addClass('marcar-pendente-btn');
-
-                            form.removeClass('form-marcar-pago')
-                                .addClass('form-marcar-pendente');
+                            form.find('.marcar-pago-btn').hide();
+                            location.reload();
                         } else {
                             alert('Falha ao marcar como pago.');
                         }
@@ -188,46 +182,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
                     }
                 });
             });
-
-            $(document).on('click', '.marcar-pendente-btn', function(e) {
-                e.preventDefault();
-
-                var form = $(this).closest('form');
-                var idContaPagar = form.find('input[name="id_conta_pagar"]').val();
-
-                $.ajax({
-                    type: 'POST',
-                    url: '../../../helpers/marcar_pendente.php',
-                    data: {
-                        id_conta_pagar: idContaPagar
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            form.closest('tr').find('.status-pago')
-                                .removeClass('text-success')
-                                .addClass('text-danger')
-                                .text('Não');
-                            form.find('.marcar-pendente-btn')
-                                .removeClass('btn-danger')
-                                .addClass('btn-success')
-                                .text('Marcar como Pago')
-                                .removeClass('marcar-pendente-btn')
-                                .addClass('marcar-pago-btn');
-
-                            form.removeClass('form-marcar-pendente')
-                                .addClass('form-marcar-pago');
-                        } else {
-                            alert('Falha ao marcar como pendente.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Erro ao marcar como pendente:', error);
-                        alert('Erro ao marcar como pendente. Verifique o console para mais detalhes.');
-                    }
-                });
-            });
         });
+
+        $(document).ready(function() {
+        $('.marcar-pago-btn').click(function() {
+        });
+    });
     </script>
 </body>
 

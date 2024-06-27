@@ -59,7 +59,14 @@ class ContaPagarController
 
     public function marcarPago($id_conta_pagar)
     {
-        return $this->contaPagar->marcarPago($id_conta_pagar);
+        $conta = $this->getById($id_conta_pagar);
+
+        if ($conta) {
+            $success = $this->contaPagar->marcarPago($id_conta_pagar);
+            return $success;
+        }
+
+        return false;
     }
 
     public function marcarPendente($id_conta_pagar)
