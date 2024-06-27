@@ -14,6 +14,11 @@ class ContaPagarController
         $this->contaPagar = new ContaPagar($db);
     }
 
+    public function list($filtro_empresa = '', $filtro_valor = null, $condicao_valor = '', $filtro_data = '')
+    {
+        return $this->contaPagar->readAll($filtro_empresa, $filtro_valor, $condicao_valor, $filtro_data);
+    }
+
     public function create($valor, $data_pagar, $pago, $id_empresa)
     {
         $this->contaPagar->valor = $valor;
@@ -32,10 +37,10 @@ class ContaPagarController
         return $this->contaPagar->getById($id_conta_pagar);
     }
 
-    public function list()
-    {
-        return $this->contaPagar->readAll();
-    }
+    // public function list()
+    // {
+    //     return $this->contaPagar->readAll();
+    // }
 
     public function update($dados)
     {

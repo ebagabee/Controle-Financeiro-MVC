@@ -2,7 +2,16 @@
 require_once '../../controllers/ContaPagarController.php';
 
 $contaPagarController = new ContaPagarController();
-$contas = $contaPagarController->list();
+$contas = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $filtro_empresa = isset($_GET['filtro_empresa']) ? $_GET['filtro_empresa'] : '';
+    $filtro_valor = isset($_GET['filtro_valor']) ? $_GET['filtro_valor'] : null;
+    $condicao_valor = isset($_GET['condicao_valor']) ? $_GET['condicao_valor'] : '';
+    $filtro_data = isset($_GET['filtro_data']) ? $_GET['filtro_data'] : '';
+
+    $contas = $contaPagarController->list($filtro_empresa, $filtro_valor, $condicao_valor, $filtro_data);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
     $id_conta_pagar = $_POST['excluir_conta'];
@@ -33,6 +42,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
             <h1 class="mb-0">Controle Financeiro de Contas a Pagar</h1>
         </div>
     </header>
+    <div class="container mt-4">
+        <h2 class="mb-3">Filtrar Contas a Pagar</h2>
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro_empresa">Nome da Empresa:</label>
+                        <input type="text" class="form-control" id="filtro_empresa" name="filtro_empresa" value="<?php echo isset($_GET['filtro_empresa']) ? $_GET['filtro_empresa'] : ''; ?>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro_valor">Valor:</label>
+                        <input type="number" class="form-control" id="filtro_valor" name="filtro_valor" value="<?php echo isset($_GET['filtro_valor']) ? $_GET['filtro_valor'] : ''; ?>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="condicao_valor">Condição:</label>
+                        <select class="form-control" id="condicao_valor" name="condicao_valor">
+                            <option value="">Selecionar...</option>
+                            <option value="MAIOR" <?php echo isset($_GET['condicao_valor']) && $_GET['condicao_valor'] === 'MAIOR' ? 'selected' : ''; ?>>Maior que</option>
+                            <option value="MENOR" <?php echo isset($_GET['condicao_valor']) && $_GET['condicao_valor'] === 'MENOR' ? 'selected' : ''; ?>>Menor que</option>
+                            <option value="IGUAL" <?php echo isset($_GET['condicao_valor']) && $_GET['condicao_valor'] === 'IGUAL' ? 'selected' : ''; ?>>Igual a</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro_data">Data de Pagamento:</label>
+                        <input type="date" class="form-control" id="filtro_data" name="filtro_data" value="<?php echo isset($_GET['filtro_data']) ? $_GET['filtro_data'] : ''; ?>">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="list.php" class="btn btn-secondary ml-2">Limpar Filtros</a>
+        </form>
+    </div>
     <div class="container mt-4">
         <ul class="nav nav-tabs">
             <li class="nav-item">
@@ -88,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_conta'])) {
                                                 </form>
                                             <?php endif; ?>
                                         </div>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

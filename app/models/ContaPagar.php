@@ -29,13 +29,49 @@ class ContaPagar
         return $stmt->execute();
     }
 
-    public function readAll()
+    public function readAll($filtro_empresa = '', $filtro_valor = null, $condicao_valor = '', $filtro_data = '')
     {
         $query = "SELECT cp.*, e.nome AS nome_empresa 
-                  FROM " . $this->table_name . " cp
-                  LEFT JOIN tbl_empresa e ON cp.id_empresa = e.id_empresa";
+              FROM " . $this->table_name . " cp
+              LEFT JOIN tbl_empresa e ON cp.id_empresa = e.id_empresa";
+
+        // Aplicando filtros
+        $params = [];
+        $where = [];
+
+        if (!empty($filtro_empresa)) {
+            $where[] = "e.nome LIKE :filtro_empresa";
+            $params['filtro_empresa'] = '%' . $filtro_empresa . '%';
+        }
+
+        if ($filtro_valor !== null && !empty($condicao_valor)) {
+            switch ($condicao_valor) {
+                case 'MAIOR':
+                    $where[] = "cp.valor > :filtro_valor";
+                    break;
+                case 'MENOR':
+                    $where[] = "cp.valor < :filtro_valor";
+                    break;
+                case 'IGUAL':
+                    $where[] = "cp.valor = :filtro_valor";
+                    break;
+                default:
+                    break;
+            }
+            $params['filtro_valor'] = $filtro_valor;
+        }
+
+        if (!empty($filtro_data)) {
+            $where[] = "cp.data_pagar = :filtro_data";
+            $params['filtro_data'] = $filtro_data;
+        }
+
+        if (!empty($where)) {
+            $query .= " WHERE " . implode(" AND ", $where);
+        }
+
         $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
